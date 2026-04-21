@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import Navbar from "../components/Navbar";
 
+const BASE_URL = "https://emsapp1-production.up.railway.app/api";
+
 const Dashboard = () => {
   const [myEvents, setMyEvents] = useState([]);
   const [allEvents, setAllEvents] = useState([]);
@@ -11,7 +13,7 @@ const Dashboard = () => {
   const fetchMyEvents = async () => {
     try {
       const res = await fetch(
-        `http://localhost:8080/api/registrations/user/${userId}`
+        `${BASE_URL}/registrations/user/${userId}`
       );
       const data = await res.json();
       setMyEvents(data);
@@ -23,7 +25,7 @@ const Dashboard = () => {
   // Fetch all events
   const fetchAllEvents = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/events");
+      const res = await fetch(`${BASE_URL}/events`);
       const data = await res.json();
       setAllEvents(data);
     } catch (err) {
@@ -31,9 +33,20 @@ const Dashboard = () => {
     }
   };
 
+  // Initial load
   useEffect(() => {
     fetchMyEvents();
     fetchAllEvents();
+  }, []);
+
+  // 🔥 Auto refresh (VERY IMPORTANT)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchMyEvents();
+      fetchAllEvents();
+    }, 3000); // refresh every 3 sec
+
+    return () => clearInterval(interval);
   }, []);
 
   // Analytics values
@@ -50,7 +63,7 @@ const Dashboard = () => {
 
       <div className="dashboard-container">
 
-        {/* 🔥 ANALYTICS SECTION */}
+        {/* 🔥 ANALYTICS */}
         <div className="analytics">
           <div className="box">
             <h3>{totalEvents}</h3>
@@ -93,7 +106,11 @@ const Dashboard = () => {
 
                 <div className="status">
                   Status:{" "}
-                  <span className={reg.status === "REGISTERED" ? "green" : "red"}>
+                  <span
+                    className={
+                      reg.status === "REGISTERED" ? "green" : "red"
+                    }
+                  >
                     {reg.status}
                   </span>
                 </div>
