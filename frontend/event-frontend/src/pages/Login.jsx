@@ -19,46 +19,47 @@ const Login = () => {
     return true;
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+const BASE_URL = "https://emsapp1-production.up.railway.app/api";
 
-    if (!validate()) return;
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch(
-        `http://localhost:8080/api/auth/login?email=${form.email}&password=${form.password}`,
-        {
-          method: "POST"
-        }
-      );
+  if (!validate()) return;
+
+  try {
+    const res = await fetch(
+      `${BASE_URL}/auth/login?email=${form.email}&password=${form.password}`,
+      {
+        method: "POST"
+      }
+    );
+
+    const text = await res.text();
 
     if (!res.ok) {
-  const msg = await res.text();
-
-  if (msg.includes("not registered")) {
-    alert("User not found. Please register.");
-  } else {
-    alert("Incorrect password");
-  }
-
-  return;
-}
-
-      const data = await res.json();
-
-      // 🔥 Store userId for future use
-      localStorage.setItem("userId", data.id);
-
-      alert("Login successful!");
-
-      // Redirect to events page
-      window.location.href = "/events";
-
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+      if (text.includes("not found") || text.includes("User not found")) {
+        alert("User not found. Please register.");
+      } else if (text.includes("Invalid") || text.includes("password")) {
+        alert("Incorrect password");
+      } else {
+        alert(text);
+      }
+      return;
     }
-  };
+
+    const data = JSON.parse(text);
+
+    // store userId
+    localStorage.setItem("userId", data.id);
+
+    alert("Login successful!");
+    window.location.href = "/events";
+
+  } catch (err) {
+    console.error(err);
+    alert("Server not reachable");
+  }
+};
 
   return (
     <div className="login-container">
