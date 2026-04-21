@@ -55,7 +55,11 @@ const Signup = () => {
         },
         body: JSON.stringify(form)
       });
-
+if (!res.ok) {
+  const error = await res.text();
+  alert(error); // THIS WILL SHOW REAL ERROR
+  return;
+}
       if (!res.ok) {
         const text = await res.text();
         alert(text); // email already exists case
