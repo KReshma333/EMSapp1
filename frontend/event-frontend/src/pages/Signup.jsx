@@ -42,38 +42,37 @@ const Signup = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const BASE_URL = "https://emsapp1-production.up.railway.app/api";
 
-    if (!validate()) return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch("http://localhost:8080/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
-if (!res.ok) {
-  const error = await res.text();
-  alert(error); // THIS WILL SHOW REAL ERROR
-  return;
-}
-      if (!res.ok) {
-        const text = await res.text();
-        alert(text); // email already exists case
-        return;
-      }
+  if (!validate()) return;
 
-      alert("Signup successful!");
-      window.location.href = "/login";
+  try {
+    const res = await fetch(`${BASE_URL}/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(form)
+    });
 
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong");
+    const data = await res.text();
+
+    if (!res.ok) {
+      alert(data);
+      return;
     }
-  };
+
+    alert("Signup successful!");
+    window.location.href = "/login";
+
+  } catch (err) {
+    console.error(err);
+    alert("Server not reachable");
+  }
+};
 
   return (
     <div className="signup-container">
