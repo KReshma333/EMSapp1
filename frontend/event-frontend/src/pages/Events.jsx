@@ -3,14 +3,16 @@ import "./Events.css";
 import Navbar from "../components/Navbar";
 import EventCard from "../components/EventCard";
 
+const BASE_URL = "https://emsapp1-production.up.railway.app/api";
+
 const Events = () => {
   const [events, setEvents] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  // Fetch events from backend
+  // Fetch events
   const fetchEvents = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/events");
+      const res = await fetch(`${BASE_URL}/events`);
       const data = await res.json();
       setEvents(data);
     } catch (err) {
@@ -22,24 +24,21 @@ const Events = () => {
     fetchEvents();
   }, []);
 
-  // Register for event
+  // Register
   const handleRegister = async (eventId) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/api/registrations/register?userId=${userId}&eventId=${eventId}`,
+        `${BASE_URL}/registrations/register?userId=${userId}&eventId=${eventId}`,
         { method: "POST" }
       );
 
-      
       if (!res.ok) {
-  const error = await res.text();
-  alert(error);
-  return;
-}
+        const error = await res.text();
+        alert(error);
+        return;
+      }
 
-alert("Successfully registered for event!");
-
-      // Refresh after registration
+      alert("Successfully registered for event!");
       fetchEvents();
 
     } catch (err) {
